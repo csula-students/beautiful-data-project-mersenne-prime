@@ -37,7 +37,8 @@ class collector():
             sig= realdata&0x00ffffff
 
             #mfcc_feat needs to be stored in MongoDB, it is a numpy array that is 5999 in length
-            #Each Audio file is a scene which is being classified, one of items used to classfy the scene is
+            #Each Audio file is a scene which is being classified, one of feature vectors
+            #used to classfy the scene is
             #the mfcc_feat array
             mfcc_feat = mfcc(sig,rate)
             #print("MFCC: ",mfcc_feat)
