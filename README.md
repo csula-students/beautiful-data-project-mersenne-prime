@@ -3,7 +3,8 @@
 Currently using this library for mfcc but might change it to own functions:
 http://python-speech-features.readthedocs.org/en/latest/
 
-Required File Structure is:
+Required File Structure is to make directory:
+
 datasets/
 
 Inside datasets untar datafiles from Task2:
