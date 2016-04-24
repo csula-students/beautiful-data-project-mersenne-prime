@@ -1,0 +1,29 @@
+1. What question(s) did you decide to work on as a team? 
+	
+	- Our question is "how can we detect and classify audio signals". 
+	- We will be working on the DCASE2016 challlenge task 1: http://www.cs.tut.fi/sgn/arg/dcase2016/task-acoustic-scene-classification
+	
+2. What is your data source(s)? 
+
+	- Our dataset is a set of 30 second recordings of acoustic scenes. With that initial data set, we parse those audio recordings to Mel Frequency Cepstral Coefficients (MFCCs)
+
+3. How long does it take for you to download data? Have you downloaded complete data set?
+
+	- Screenshot attatched to repo
+	- To download the entire set, it took me about an hour. 
+	- Yes, we do have the complete data set. 
+	
+4. How large is your data (size wise and number of records wise)?
+	- 7.5GB in size (audio files)
+	- 1013 records (audio files), this should mean 1013 rows of MFCC values as well. 
+
+5. Do you face any dirty data issue? If you do, how did you clean up your data? 
+	- I don't think we have any dirty data. The audio files we get should be complete. It's possible that our 
+	MFCC data might have some dirty data but we'll have to see.
+	
+	- If we do get incomplete, inaccurate, or erroneous MFCC data, our cean up process will probably be a matter 
+	of troubleshooting our data extraction process. 
+
+6. How do you store the data you downloaded? 
+
+	- Audio files are just saved on our local devices. The MFCC values are stored in MongoDB
