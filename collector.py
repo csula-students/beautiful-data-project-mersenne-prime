@@ -6,7 +6,7 @@ class collector():
         self.working = []
 
     #Probably needs some paramters
-    def readMongoDB():
+    def read_mongodb():
         pass
 
         

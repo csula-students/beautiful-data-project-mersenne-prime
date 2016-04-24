@@ -49,7 +49,7 @@ class source():
 
             #This line is the difficult part which required stackoverflow, it makes the data into 32bit data,
             #but because it is actually 24bit data there is included redundant data in the first byte.
-            realdata = as_strided(rawbytes.view(np.int32), strides=(12,3,), shape=(frames,4))
+            realdata = as_strided(rawbytes.view(np.int32), strides=(12,3,), shape=(frames,2))
 
             #This ANDs the bits by a byte mask of the last 24bits, to get rid of the redundant data
             sig = realdata&0x00ffffff
@@ -71,8 +71,8 @@ class source():
             mfcc_feat = mfcc(sig,samplerate=rate)
             
             #Insert records into mongodb
-            self.insert_mongo(self.mfcc_fv,mfcc_feat,key,value)
-            #print("MFCC: ",mfcc_feat)            
+            #self.insert_mongo(self.mfcc_fv,mfcc_feat,key,value)
+            print("MFCC: ",mfcc_feat.shape)            
             
 
     def init_file_map(self):
