@@ -1,5 +1,5 @@
-from collector import collector
+from source import source
 
-collect = collector("datasets/TUT-acoustic-scenes-2016-development/")
+so = source("datasets/TUT-acoustic-scenes-2016-development/")
 
-collect.collect()
+so.source_save()

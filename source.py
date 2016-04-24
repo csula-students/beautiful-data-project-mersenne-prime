@@ -64,7 +64,7 @@ class source():
             #This is the entire array of feature vectors for each audio sample.
             #Additional feature vectors might be added later but this is good for inital tests.
             mfcc_feat = mfcc(sig,samplerate=rate)
-            #print("MFCC: ",mfcc_feat)
+            print("MFCC: ",mfcc_feat)
 
     def init_file_map(self):
         files_present = glob.glob(self.home_dir + "audio/*")
