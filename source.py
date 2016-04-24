@@ -5,6 +5,9 @@ from features import mfcc
 import glob
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
+from pymongo import MongoClient
+from bson.binary import Binary
+import pickle
 
 class source():
     def __init__(self,home_dir="./"):
@@ -12,7 +15,9 @@ class source():
         self.train_file_map = {}
         self.home_dir=home_dir
         self.init_file_map()
-
+        self.mongo_client = MongoClient()
+        self.features_db = self.mongo_client.task2_features
+        self.mfcc_fv = self.features_db.mfcc_fv
 
     '''
     Source and munge data, then store into MongoDB.
@@ -64,7 +69,11 @@ class source():
             #This is the entire array of feature vectors for each audio sample.
             #Additional feature vectors might be added later but this is good for inital tests.
             mfcc_feat = mfcc(sig,samplerate=rate)
-            print("MFCC: ",mfcc_feat)
+            
+            #Insert records into mongodb
+            self.insert_mongo(self.mfcc_fv,mfcc_feat,key,value)
+            #print("MFCC: ",mfcc_feat)            
+            
 
     def init_file_map(self):
         files_present = glob.glob(self.home_dir + "audio/*")
@@ -77,3 +86,12 @@ class source():
                     self.train_file_map[self.home_dir + file_loc] = acoustic_scene_name
 
         
+    def insert_mongo(self,col,np_array,key,value):
+        #First need to serialize mfcc_feat using pickle,
+        #then store in a Binary container for mongodb
+        store_np = Binary( pickle.dumps( np_array, protocol=2) )
+        fv = {"mfcc_array":store_np,
+              "class":value,
+              "file_name_id":key
+        }
+        result = col.insert_one(fv).inserted_id
