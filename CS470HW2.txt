@@ -5,25 +5,33 @@
 	
 2. What is your data source(s)? 
 
-	- Our dataset is a set of 30 second recordings of acoustic scenes. With that initial data set, we parse those audio recordings to Mel Frequency Cepstral Coefficients (MFCCs)
+	- Our dataset is a set of 30 second recordings of acoustic scenes. With that initial data set, we parse those audio recordings to get 13 feature vectors of Mel Frequency Cepstral Coefficients (MFCCs) for each audio file.
 
 3. How long does it take for you to download data? Have you downloaded complete data set?
 
 	- Screenshot attatched to repo
 	- To download the entire set, it took me about an hour. 
 	- Yes, we do have the complete data set. 
+	- The code is designed to not have to work on the complete data set so it can work on parts of the dataset at a time.
 	
 4. How large is your data (size wise and number of records wise)?
 	- 7.5GB in size (audio files)
-	- 1013 records (audio files), this should mean 1013 rows of MFCC values as well. 
+	- 1013 records (audio files), this should mean 1013 * 13 = 13169 rows of MFCC feature vectors as well. 
 
 5. Do you face any dirty data issue? If you do, how did you clean up your data? 
-	- I don't think we have any dirty data. The audio files we get should be complete. It's possible that our 
-	MFCC data might have some dirty data but we'll have to see.
+	- The binary data was in a format which had to be munged.  The data was in a encoded 24-bit signed
+	  pulse coded modulation encoding and since numpy does not have a 24bit datatype it involved striding 
+	  and bit masking the data.
 	
-	- If we do get incomplete, inaccurate, or erroneous MFCC data, our cean up process will probably be a matter 
-	of troubleshooting our data extraction process. 
 
 6. How do you store the data you downloaded? 
 
-	- Audio files are just saved on our local devices. The MFCC values are stored in MongoDB
+	- Audio files are just saved on our local devices. The MFCC values are serlized stored in MongoDB
+	according to:
+	{"class":{
+            "mfcc_array":<A binary container for a serilized numpy multidimensional array which is an array of MFCC feature vecotrs>,
+            "scene":<A string which is a sound scene>,
+            "classifiers":<Future type which will be a dict of classifiers and a performance metric>
+            },
+              "file_name_id":<A string which is a unique identifier based on the relative file location and file name>
+        }
