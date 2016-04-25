@@ -1,6 +1,7 @@
 1. What question(s) did you decide to work on as a team? 
 	
-	- Our question is "how can we detect and classify audio signals". 
+	- Our question is "how can we detect and classify audio signals".  Specifically we will be testing out different
+	classifiers and other metrics related to individual classifiers (such as paramters related to support vector machines) and providing a web based interface which will allow a user to quickly gain intiutive metrics on classifier performance.
 	- We will be working on the DCASE2016 challlenge task 1: http://www.cs.tut.fi/sgn/arg/dcase2016/task-acoustic-scene-classification
 	
 2. What is your data source(s)? 
