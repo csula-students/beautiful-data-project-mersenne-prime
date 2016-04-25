@@ -1,4 +1,3 @@
-#from scipy.io.wavfile import read
 import wave
 from subprocess import call
 from features import mfcc
@@ -28,6 +27,10 @@ class source():
         for key,value in self.train_file_map.items():
             wav = wave.open(key)
             rate = wav.getframerate()
+
+            #Binary file needs to be munged because it is 2 channel
+            #encoding is 24bit signed integer Pulse Code Modulation (PCM)
+            #with a 44.1kHz sampling
 
             #The initial way I was hoping to munge the raw byte data
             #nframes = wav.getnframes()
@@ -71,8 +74,8 @@ class source():
             mfcc_feat = mfcc(sig,samplerate=rate)
             
             #Insert records into mongodb
-            #self.insert_mongo(self.mfcc_fv,mfcc_feat,key,value)
-            print("MFCC: ",mfcc_feat.shape)            
+            self.insert_mongo(self.mfcc_fv,mfcc_feat,key,value)
+            #print("MFCC: ",mfcc_feat.shape)            
             
 
     def init_file_map(self):
@@ -85,13 +88,34 @@ class source():
                 if file_loc not in self.train_file_map and (self.home_dir + file_loc) in files_present:
                     self.train_file_map[self.home_dir + file_loc] = acoustic_scene_name
 
-        
-    def insert_mongo(self,col,np_array,key,value):
+    '''
+    Insert a new document into mongodb.
+    Use unique file name as id.
+    class - object which describes a unique sound scene being classified.
+         mfcc_array - binary container containing serlized numpy multidimensional array which contains mfcc feature vectors.
+         scene - the sound scene 
+         classifiers - future object which will contain information regarding which classifiers 
+                       ( Hidden Markov Chain, Support Vector Machine ) have been used on this sound scene.
+    file_name_id - relative path + file name as unique id.
+
+    Paramters: 
+    col - feature vector array
+    np_array - 
+    file_id - file name id
+    sound_scene - sound scene
+
+    Return:
+    None
+    '''        
+    def insert_mongo(self,col,np_array,file_id,sound_scene):
         #First need to serialize mfcc_feat using pickle,
         #then store in a Binary container for mongodb
-        store_np = Binary( pickle.dumps( np_array, protocol=2) )
-        fv = {"mfcc_array":store_np,
-              "class":value,
-              "file_name_id":key
+        store_np = Binary( pickle.dumps( np_array, protocol=2 ) )
+        fv = {"class":{
+            "mfcc_array":store_np,
+            "scene":sound_scene,
+            "classifiers":None
+            },
+              "file_name_id":file_id
         }
         result = col.insert_one(fv).inserted_id
