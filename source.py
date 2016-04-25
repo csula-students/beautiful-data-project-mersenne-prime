@@ -99,8 +99,8 @@ class source():
     file_name_id - relative path + file name as unique id.
 
     Paramters: 
-    col - feature vector array
-    np_array - 
+    col - mongodb collections
+    np_array - feature vector array
     file_id - file name id
     sound_scene - sound scene
 
