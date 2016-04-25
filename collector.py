@@ -9,10 +9,28 @@ class collector():
         self.features_db = self.mongo_client.task2_features
         self.mfcc_fv = self.features_db.mfcc_fv
 
+    '''
+    Get all distinct sound scenes.
+
+    Parameters: None
+    Return: A list of sound scene strings.
+
+    '''
     def get_scenes(self):
         res = self.mfcc_fv.distinct("class.scene")
         return res
-        
+
+    '''
+    Deserialize multidimension numpy array of feature vectors.
+    
+    Parameters:
+    sound_scene - the sound scene to search for.
+    limit_num - To limit the number of searched items.
+
+    Return:
+    An array of feature vector arrays associated with a sound scene.
+
+    '''
     def get_feature_vector_array(self,sound_scene,limit_num=None):
         feature_array_list = []
 
