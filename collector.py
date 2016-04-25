@@ -35,7 +35,9 @@ class collector():
         feature_array_list = []
 
         if limit_num == None:
+            #Get serialized data in binary format.
             pickled = self.mfcc_fv.find({"class.scene" : sound_scene})
+            #Deserialize data back into numpy array.
             for pic in pickled:
                 feature_array_list.append( pickle.loads( pic['class']['mfcc_array'] ) )
             return feature_array_list
