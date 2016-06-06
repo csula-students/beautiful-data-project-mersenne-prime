@@ -43,14 +43,16 @@ def train_features():
             for row in mfcc_array:
                 mean.append(np.average(row))
                 var.append(np.var(row))
-            pos_train.append(mean+var)
+            posMeanVar = mean + var
+            pos_train.append(posMeanVar)            
         for mfcc_array in neg_result:
             mean = []
             var = []
             for row in mfcc_array:
                 mean.append(np.average(row))
                 var.append(np.var(row))
-            neg_train.append(mean+var)
+            negMeanVar = mean+var
+            neg_train.append(negMeanVar)
             
         #print(mfcc_array[:,0].shape)
         labels = np.concatenate([np.ones(len(pos_train)),np.zeros(len(neg_train))])
@@ -63,7 +65,7 @@ def train_features():
         target_names = ['Not ' + scene + ' scene','Yes ' + scene +' scene']
         print(classification_report(y_test, output, target_names=target_names))
         cm = confusion_matrix(y_test,output)
-        #plot_confusion_matrix(cm,conf_prefix=scene,title='assets/' + scene[0].upper() + scene[1:] + ' Scene Confusion matrix')
+        plot_confusion_matrix(cm,conf_prefix=scene,title='assets/' + scene[0].upper() + scene[1:] + ' Scene Confusion matrix')
         #break
             
 
