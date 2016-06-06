@@ -81,17 +81,19 @@ class es_source():
                     variance = np.var(mfcc)
                     mean.append(avg)
                     var.append(variance)
-                pos_train.append(mean+var)
-                
+                meanAndVar = mean+var
+                pos_train.append(meanAndVar)
             for sample in neg_result:
                 mean = []
                 var = []
                 for mfcc in sample:
                     mean.append(np.average(mfcc))
                     var.append(np.var(mfcc))
-                neg_train.append(mean+var)
+                negMeanAndVar = mean+var
+                neg_train.append(negMeanAndVar)
 
             #print(mfcc_array[:,0].shape)
+            print(pos_train)
             labels = np.concatenate([np.ones(len(pos_train)),np.zeros(len(neg_train))])
             to_train = pos_train + neg_train
             X_train, X_test, y_train, y_test = train_test_split(to_train,labels,test_size=25)
@@ -155,7 +157,7 @@ class es_source():
                     self.mfcc_insert_dict["max"] = mfcc_max
                     #self.insert_es_mfcc(self.mfcc_insert_dict)
                     self.bulk_builder_mfcc(bulk_insert,self.mfcc_insert_dict)
-                helpers.bulk(self.es,bulk_insert)
+                #helpers.bulk(self.es,bulk_insert)
                 pos_train.append(mean+var)
                 sample_id += 1
             print(sample_id * len(sample))
@@ -164,4 +166,4 @@ if __name__ == '__main__':
     already_done = ['car', 'tram', 'library', 'city_center', 'home']
     es_so = es_source()
     #es_so.source_save_mfcc(already_done)
-    #es_so.train_classifier()
+    es_so.train_classifier()
