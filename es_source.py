@@ -1,8 +1,12 @@
 from collector import collector
 
 from sklearn import svm
+from sklearn.mixture import GMM
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import classification_report
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
 from sklearn.metrics import confusion_matrix
 from sklearn import metrics
 
@@ -10,6 +14,7 @@ import numpy as np
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 import certifi
+import time
 
 class es_source():
     def __init__(self,):
@@ -57,10 +62,33 @@ class es_source():
 
         array.append(builder)
 
+
+    def bulk_builder_classifier(self,array,classi_insert_dict):
+        builder = {
+            "_index":"audioscene",
+            "_type":"classifier",
+            "_id":classi_insert_dict["id"],
+            "_source":{
+                'scene':classi_insert_dict["scene"],
+                'classifier':classi_insert_dict["classifier"],
+                'numsample':classi_insert_dict["numsample"],
+                'truepos':classi_insert_dict["truepos"],
+                'falsepos':classi_insert_dict["falsepos"],
+                'trueneg':classi_insert_dict["trueneg"],
+                'falseneg':classi_insert_dict["falseneg"],
+                'precision':classi_insert_dict["prec"],
+                'recall':classi_insert_dict["rec"],
+                'fittimems':classi_insert_dict["fittime"],
+                'predicttimems':classi_insert_dict["predictime"]
+            }
+        }
+
+        array.append(builder)
+
     def insert_es_classifier(self,mfcc_array,sound_scene,classifier_data):
         pass
 
-    def train_classifier(self,):
+    def train_gmm_classifier(self,):
         clf_dict = {}
         mfcc_dict = {}
 
@@ -69,7 +97,7 @@ class es_source():
         for scene in scenes:
             result = np.asarray(self.co.get_feature_vector_array(sound_scene=scene))
             neg_result = np.asarray(self.co.get_feature_vector_array(sound_scene=scenes[(scenes.index(scene) + 1) % len(scenes)]))
-            clf = svm.SVC(gamma=0.001, C=1500.)
+            clf = svm.SVC(gamma=0.001, C=1500.,cache_size=500)
             clf_dict[scene] = clf
             pos_train = []
             neg_train = []
@@ -92,22 +120,139 @@ class es_source():
                 negMeanAndVar = mean+var
                 neg_train.append(negMeanAndVar)
 
-            #print(mfcc_array[:,0].shape)
-            print(pos_train)
-            labels = np.concatenate([np.ones(len(pos_train)),np.zeros(len(neg_train))])
-            to_train = pos_train + neg_train
-            X_train, X_test, y_train, y_test = train_test_split(to_train,labels,test_size=25)
-            cur_clf = clf_dict[scene]
-            cur_clf.fit(X_train,y_train)
-            output = cur_clf.predict(X_test)
-            metrics.accuracy_score(y_test, output)
-            target_names = ['Not ' + scene + ' scene','Yes ' + scene +' scene']
-            print(classification_report(y_test, output, target_names=target_names))
-            cm = confusion_matrix(y_test,output)
-            # (Actual No, Predicted No)(True Negative), (Actual No, Predicted Yes)(False Positive)
-            print(cm[0])
-            # (Acutal Yes, Predicted No)(False Negative), (Acutal Yes, Predicted Yes)(True Positive)
-            print(cm[1])
+    def train_classifier(self,):
+        id_num = 1
+        clf_dict = {}
+        mfcc_dict = {}
+        classi_insert_dict = {}
+        bulk_insert = []
+        scenes = self.co.get_scenes()
+        scenes.remove('test_name')
+        scenes=['car', 'tram', 'bus','residential_area']
+        print(scenes)
+        for scene in scenes:
+            print(scene)
+            result = np.asarray(self.co.get_feature_vector_array(sound_scene=scene))
+            neg_result = np.asarray(self.co.get_feature_vector_array(sound_scene=scenes[(scenes.index(scene) + 1) % len(scenes)]))
+            clf = svm.SVC(gamma=0.001, C=1500.,cache_size=500)
+            forest = RandomForestClassifier(n_estimators = 100)
+            clf_dict[scene] = clf
+            i = 3
+            j = 0
+            total = len(result)
+            test_sizes = np.arange(1,50,3)
+            #test_sizes = np.append(test_sizes,[25,28,31])
+            #print(test_sizes)
+            #print(result.shape)
+            while(i<total):
+                pos_train = []
+                neg_train = []
+                fraction = result[0:i]
+                #print(fraction.shape)
+                for sample in fraction:
+                    mean = []
+                    var = []
+                    for mfcc in sample:
+                        avg = np.average(mfcc)
+                        variance = np.var(mfcc)
+                        mean.append(avg)
+                        var.append(variance)
+                    meanAndVar = mean+var
+                    pos_train.append(meanAndVar)
+                neg_fraction = neg_result[0:i]
+                #print(neg_fraction.shape)
+                for sample in neg_fraction:
+                    mean = []
+                    var = []
+                    for mfcc in sample:
+                        mean.append(np.average(mfcc))
+                        var.append(np.var(mfcc))
+                    negMeanAndVar = mean+var
+                    neg_train.append(negMeanAndVar)
+                i+=5
+                #print(mfcc_array[:,0].shape)
+                #print("Sample size: ",len(pos_train))
+                num_sample = len(pos_train)
+                labels = np.concatenate([np.ones(len(pos_train)),np.zeros(len(neg_train))])
+                #print(labels)
+                to_train = pos_train + neg_train
+                X_train, X_test, y_train, y_test = train_test_split(to_train,labels,test_size=test_sizes[j])
+                j+=1
+                cur_clf = clf_dict[scene]
+                start_forest_time = time.process_time()
+                forest.fit(X_train,y_train)
+                forest_time = time.process_time() - start_forest_time
+                forest_time = forest_time * 1000
+                #print("Forest time: ",forest_time)
+                start_svm_time = time.process_time()
+                cur_clf.fit(X_train,y_train)
+                svm_time = time.process_time() - start_svm_time
+                svm_time *= 1000
+                #print("SVM time: ", svm_time)
+                start_svm_time = time.process_time()
+                output = cur_clf.predict(X_test)
+                svm_predict_time = time.process_time() - start_svm_time
+                svm_predict_time *= 1000
+                #print("SVM Predict time: ", svm_predict_time)
+                metrics.accuracy_score(y_test, output)
+                target_names = ['Not ' + scene + ' scene','Yes ' + scene +' scene']
+                start_forest_time = time.process_time() 
+                forest_output = forest.predict(X_test)
+                forest_predict_time = time.process_time() - start_forest_time
+                forest_predict_time *= 1000
+                #print("Forest Predict time: ", forest_predict_time)
+                svm_prec = precision_score(y_test,output)
+                svm_rec = recall_score(y_test,output)
+                forest_prec = precision_score(y_test,forest_output)
+                forest_rec = recall_score(y_test,forest_output)
+                #print("SVM report: ",classification_report(y_test, output, target_names=target_names))
+                #print("Random Forest report: ", classification_report(y_test, forest_output, target_names=target_names))
+                cm = confusion_matrix(y_test,output)
+                cm_forest = confusion_matrix(y_test,forest_output)
+
+                # (Actual No, Predicted No)(True Negative), (Actual No, Predicted Yes)(False Positive)
+                #print(cm[0])
+                # (Acutal Yes, Predicted No)(False Negative), (Acutal Yes, Predicted Yes)(True Positive)
+                #print(cm[1])
+
+                classi_insert_dict["id"] = id_num
+                classi_insert_dict["scene"] = scene
+                classi_insert_dict["classifier"] = "svm"
+                classi_insert_dict["numsample"] = num_sample
+                classi_insert_dict["truepos"] = int(cm[1][1])
+                classi_insert_dict["falsepos"] = int(cm[0][1])
+                classi_insert_dict["trueneg"] = int(cm[0][0])
+                classi_insert_dict["falseneg"] = int(cm[1][0])
+                classi_insert_dict["prec"] = float(svm_prec)
+                classi_insert_dict["rec"] = float(svm_rec)
+                classi_insert_dict["fittime"] = svm_time
+                classi_insert_dict["predictime"] = svm_predict_time
+                id_num += 1
+                self.bulk_builder_classifier(bulk_insert,classi_insert_dict)
+                classi_insert_dict["id"] = id_num
+                classi_insert_dict["scene"] = scene
+                classi_insert_dict["classifier"] = "randomforest"
+                classi_insert_dict["numsample"] = num_sample
+                if(len(cm_forest) == 2):
+                    classi_insert_dict["truepos"] = int(cm_forest[1][1])
+                    classi_insert_dict["falsepos"] = int(cm_forest[0][1])
+                    classi_insert_dict["trueneg"] = int(cm_forest[0][0])
+                    classi_insert_dict["falseneg"] = int(cm_forest[1][0])
+                else:
+                    print(cm_forest)
+                    classi_insert_dict["truepos"] = 0
+                    classi_insert_dict["falsepos"] = 0
+                    classi_insert_dict["trueneg"] = 0
+                    classi_insert_dict["falseneg"] = 0
+                classi_insert_dict["prec"] = float(forest_prec)
+                classi_insert_dict["rec"] = float(forest_rec)
+                classi_insert_dict["fittime"] = forest_time
+                classi_insert_dict["predictime"] = forest_predict_time
+                id_num+=1
+                self.bulk_builder_classifier(bulk_insert,classi_insert_dict)
+                #print(bulk_insert)
+        helpers.bulk(self.es,bulk_insert)
+
 
     def source_save_mfcc(self,to_remove=None):
         mfcc_dict = {}

@@ -65,11 +65,10 @@ def train_features():
         target_names = ['Not ' + scene + ' scene','Yes ' + scene +' scene']
         print(classification_report(y_test, output, target_names=target_names))
         cm = confusion_matrix(y_test,output)
-        plot_confusion_matrix(cm,conf_prefix=scene,title='assets/' + scene[0].upper() + scene[1:] + ' Scene Confusion matrix')
+        #plot_confusion_matrix(cm,conf_prefix=scene,title='assets/' + scene[0].upper() + scene[1:] + ' Scene Confusion matrix')
         #break
             
 
 
 if __name__ == '__main__':
     train_features()
-    
