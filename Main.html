@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Classification of Acoustic Scenes</title>
+
+
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+	integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+	crossorigin="anonymous">
+
+
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
+	integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r"
+	crossorigin="anonymous">
+
+
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+	integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+	crossorigin="anonymous"></script>
+
+</head>
+<body>
+
+	<nav class="navbar navbar-inverse">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+					aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">Classification Of Acoustic
+					Scenes</a>
+			</div>
+		</div>
+	</nav>
+
+	<div class="jumbotron">
+		<h1>Classification of Acoustic Scenes</h1>
+		<p>Test one of your audio files with our prediction algorithm.</p>
+		<p>
+			Please choose a file:<br> <input type="file" name="datafile"
+				size="40">
+		</p>
+		<div>
+			<input type="submit" value="Send">
+		</div>
+
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">Result</h3>
+			</div>
+			<div class="panel-body"></div>
+
+		</div>
+
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">Presentation</h3>
+			</div>
+			<div class="panel-body">
+				<iframe width="560" height="315"
+					src="https://www.youtube.com/embed/wZSiPAJFtg4" frameborder="0"
+					allowfullscreen></iframe>
+			</div>
+
+		</div>
+
+
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">Visualization 1</h3>
+			</div>
+			<div class="panel-body">
+				<iframe
+					src="https://search-cs454bigdata-hykyt4h33jzdrarmwaetqehd54.us-west-2.es.amazonaws.com/_plugin/kibana/?embed&#/visualize/edit/car_histogram_of_average_mfcc_values?_g=()&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'scene:bus')),vis:(aggs:!((id:'1',params:(),schema:metric,type:count),(id:'2',params:(extended_bounds:(),field:mfcc,interval:1),schema:segment,type:histogram)),listeners:(),params:(addLegend:!t,addTooltip:!t,defaultYExtents:!f,mode:stacked,shareYAxis:!t),type:histogram))"
+					height="600" width="800"></iframe>
+			</div>
+
+		</div>
+
+
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">Visualization 2</h3>
+			</div>
+			<div class="panel-body">
+				<iframe
+					src="https://search-cs454bigdata-hykyt4h33jzdrarmwaetqehd54.us-west-2.es.amazonaws.com/_plugin/kibana/#/dashboard/CS454BIGDATAv2?embed&_g=()&_a=(filters:!(),panels:!((col:1,id:car_histogram_of_average_mfcc_values,row:8,size_x:6,size_y:4,type:visualization),(col:7,id:tram_histogram_of_average_mfcc_values,row:8,size_x:6,size_y:4,type:visualization),(col:1,id:RF_num_samples_characterization_time,row:12,size_x:12,size_y:4,type:visualization),(col:1,id:SVM_num_samples_characterization,row:16,size_x:12,size_y:5,type:visualization),(col:1,id:RF_num_samples_characterization_true_false,row:21,size_x:12,size_y:4,type:visualization),(col:1,id:residential_area_confusion_matrix,row:25,size_x:6,size_y:7,type:visualization),(col:7,id:car_confusion_matrix,row:25,size_x:6,size_y:7,type:visualization),(col:7,id:bus_confusion_matrix,row:32,size_x:6,size_y:7,type:visualization),(col:1,id:tram_confusion_matrix,row:32,size_x:6,size_y:7,type:visualization),(col:1,id:waveformANDfeatures,row:1,size_x:12,size_y:7,type:visualization),(col:1,id:RF_num_samples_characterization_true_false_all,row:39,size_x:7,size_y:6,type:visualization),(col:8,id:RF_num_samples_characterization_time_all,row:39,size_x:5,size_y:6,type:visualization),(col:1,id:SVM_num_samples_characterization_all,row:45,size_x:12,size_y:5,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'*')),title:CS454BIGDATAv2)"
+					height="600" width="800"></iframe>
+			</div>
+
+		</div>
+
+
+	</div>
+
+
+
+
+
+</body>
+</html>

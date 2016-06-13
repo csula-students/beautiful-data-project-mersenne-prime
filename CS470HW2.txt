@@ -1,0 +1,38 @@
+1. What question(s) did you decide to work on as a team? 
+	
+	- Our question is "how can we detect and classify audio signals".  Specifically we will be testing out different
+	classifiers and other metrics related to individual classifiers (such as paramters related to support vector machines) and providing a web based interface which will allow a user to quickly gain intiutive metrics on classifier performance.
+	- We will be working on the DCASE2016 challlenge task 1: http://www.cs.tut.fi/sgn/arg/dcase2016/task-acoustic-scene-classification
+	
+2. What is your data source(s)? 
+
+	- Our dataset is a set of 30 second recordings of acoustic scenes. With that initial data set, we parse those audio recordings to get 13 feature vectors of Mel Frequency Cepstral Coefficients (MFCCs) for each audio file.
+
+3. How long does it take for you to download data? Have you downloaded complete data set?
+
+	- Screenshot attatched to repo
+	- To download the entire set, it took me about an hour. 
+	- Yes, we do have the complete data set. 
+	- The code is designed to not have to work on the complete data set so it can work on parts of the dataset at a time.
+	
+4. How large is your data (size wise and number of records wise)?
+	- 7.5GB in size (audio files)
+	- 1013 records (audio files), this should mean 1013 * 13 = 13169 rows of MFCC feature vectors as well. 
+
+5. Do you face any dirty data issue? If you do, how did you clean up your data? 
+	- The binary data was in a format which had to be munged.  The data was in a encoded 24-bit signed
+	  pulse coded modulation encoding and since numpy does not have a 24bit datatype it involved striding 
+	  and bit masking the data.
+	
+
+6. How do you store the data you downloaded? 
+
+	- Audio files are just saved on our local devices. The MFCC values are serlized stored in MongoDB
+	according to:
+	{"class":{
+            "mfcc_array":<A binary container for a serilized numpy multidimensional array which is an array of MFCC feature vecotrs>,
+            "scene":<A string which is a sound scene>,
+            "classifiers":<Future type which will be a dict of classifiers and a performance metric>
+            },
+              "file_name_id":<A string which is a unique identifier based on the relative file location and file name>
+        }
